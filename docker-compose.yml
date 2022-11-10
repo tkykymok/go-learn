@@ -6,24 +6,24 @@ services:
       dockerfile: ./docker/golang/Dockerfile
     container_name: go_container
     ports:
-      - 8000:8000
+      - "8080:8080"
+      - "2345:2345"
     tty: true
     volumes:
-      - ./go-app:/app/go
-  mysql:
+      - ./go_app:/go_app
+  db:
     build:
       context: .
       dockerfile: ./docker/mysql/Dockerfile
     container_name: mysql_container
     environment:
+      MYSQL_USER: go_test
+      MYSQL_PASSWORD: pass
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: go-app
-      TZ: 'Asia/Tokyo'
+      MYSQL_DATABASE: go_app_test
     volumes:
       - ./docker/mysql/initdb.d:/docker-entrypoint-initdb.d
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
       - ./docker/mysql/mysql_data:/var/lib/mysql
     ports:
-      - 3306:3306
-    links:
-      - go
+      - "3308:3306"

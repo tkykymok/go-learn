@@ -1,0 +1,7 @@
+[mysql]
+dbname = "go_app_test"
+user = "go_test"
+pass = "pass"
+host = "db"
+port = 3306
+sslmode = "false"
