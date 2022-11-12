@@ -1,6 +1,9 @@
+init:
+	docker compose up -d
+
 remake:
 	@make destroy
-	docker compose up -d
+	@make init
 
 destroy:
 	docker compose down --rmi all --volumes --remove-orphans

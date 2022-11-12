@@ -1,51 +1,20 @@
 package main
 
 import (
-	"context"
 	"database/sql"
-	"fmt"
 	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
-	"github.com/volatiletech/null/v8"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	_ "github.com/volatiletech/sqlboiler/v4/boil"
-	"github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"go_app/pkg/models"
+	"go_app/api/routes"
+	"go_app/pkg/todo"
 	"log"
 	"time"
 )
 
-func main() {
-	//http.HandleFunc("/", echoHello)
-	//http.ListenAndServe(":8000", nil)
-	app := fiber.New()
-
-	app.Get("", func(c *fiber.Ctx) error {
-		con := connectDB()
-		ctx := context.Background()
-
-		//result, _ := models.FindTodo(context.Background(), con, 1)
-		//result, _ := models.Todos().All(ctx, con)
-
-		type Custom struct {
-			ID   int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-			Name null.String `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
-		}
-		var result []Custom
-		err := models.Todos(
-			qm.Select("todos.id, users.name"),
-			qm.LeftOuterJoin("users on todos.userId = users.id")).Bind(ctx, con, &result)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		return c.JSON(result)
-	})
-
-	log.Fatal(app.Listen(":8080"))
-}
-
-func connectDB() *sql.DB {
+func connectDB() {
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 		panic(err)
@@ -57,12 +26,30 @@ func connectDB() *sql.DB {
 		Addr:      "db",
 		Net:       "tcp",
 		ParseTime: true,
-		Collation: "utf8mb4_unicode_ci",
+		Collation: "utf8mb4_0900_ai_ci",
 		Loc:       jst,
 	}
 	db, err := sql.Open("mysql", c.FormatDSN())
 	if err != nil {
 		panic(err)
 	}
-	return db
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+	boil.SetDB(db)
+	boil.DebugMode = true
+}
+
+func main() {
+	// DBコネクションを取得する
+	connectDB()
+
+	app := fiber.New()
+	app.Use(cors.New())
+
+	// routing
+	api := app.Group("/api")
+	routes.TodoRouter(api, todo.NewService(todo.NewRepo()))
+
+	log.Fatal(app.Listen(":8080"))
 }

@@ -10,7 +10,7 @@ services:
       - "2345:2345"
     tty: true
     volumes:
-      - ./go_app:/go_app
+      - ./go_app:/app
   db:
     build:
       context: .
