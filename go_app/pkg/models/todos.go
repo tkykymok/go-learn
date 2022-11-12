@@ -28,6 +28,7 @@ type Todo struct {
 	Title     null.String `boil:"title" json:"title,omitempty" toml:"title" yaml:"title,omitempty"`
 	Completed bool        `boil:"completed" json:"completed" toml:"completed" yaml:"completed"`
 	UserId    int         `boil:"userId" json:"userId" toml:"userId" yaml:"userId"`
+	Deleted   bool        `boil:"deleted" json:"deleted" toml:"deleted" yaml:"deleted"`
 	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 
 	R *todoR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -39,12 +40,14 @@ var TodoColumns = struct {
 	Title     string
 	Completed string
 	UserId    string
+	Deleted   string
 	CreatedAt string
 }{
 	ID:        "id",
 	Title:     "title",
 	Completed: "completed",
 	UserId:    "userId",
+	Deleted:   "deleted",
 	CreatedAt: "created_at",
 }
 
@@ -53,12 +56,14 @@ var TodoTableColumns = struct {
 	Title     string
 	Completed string
 	UserId    string
+	Deleted   string
 	CreatedAt string
 }{
 	ID:        "todos.id",
 	Title:     "todos.title",
 	Completed: "todos.completed",
 	UserId:    "todos.userId",
+	Deleted:   "todos.deleted",
 	CreatedAt: "todos.created_at",
 }
 
@@ -163,12 +168,14 @@ var TodoWhere = struct {
 	Title     whereHelpernull_String
 	Completed whereHelperbool
 	UserId    whereHelperint
+	Deleted   whereHelperbool
 	CreatedAt whereHelpernull_Time
 }{
 	ID:        whereHelperint{field: "`todos`.`id`"},
 	Title:     whereHelpernull_String{field: "`todos`.`title`"},
 	Completed: whereHelperbool{field: "`todos`.`completed`"},
 	UserId:    whereHelperint{field: "`todos`.`userId`"},
+	Deleted:   whereHelperbool{field: "`todos`.`deleted`"},
 	CreatedAt: whereHelpernull_Time{field: "`todos`.`created_at`"},
 }
 
@@ -189,9 +196,9 @@ func (*todoR) NewStruct() *todoR {
 type todoL struct{}
 
 var (
-	todoAllColumns            = []string{"id", "title", "completed", "userId", "created_at"}
-	todoColumnsWithoutDefault = []string{"title", "userId", "created_at"}
-	todoColumnsWithDefault    = []string{"id", "completed"}
+	todoAllColumns            = []string{"id", "title", "completed", "userId", "deleted", "created_at"}
+	todoColumnsWithoutDefault = []string{"id", "title", "userId", "created_at"}
+	todoColumnsWithDefault    = []string{"completed", "deleted"}
 	todoPrimaryKeyColumns     = []string{"id"}
 	todoGeneratedColumns      = []string{}
 )
@@ -611,26 +618,15 @@ func (o *Todo) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to insert into todos")
 	}
 
-	var lastID int64
 	var identifierCols []interface{}
 
 	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == todoMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -913,27 +909,16 @@ func (o *Todo) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColu
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert for todos")
 	}
 
-	var lastID int64
 	var uniqueMap []uint64
 	var nzUniqueCols []interface{}
 
 	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == todoMapping["id"] {
 		goto CacheNoHooks
 	}
 
