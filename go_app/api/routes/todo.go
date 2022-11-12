@@ -7,5 +7,6 @@ import (
 )
 
 func TodoRouter(app fiber.Router, service todo.Service) {
-	app.Get("/todos", handlers.GetTodos(service))
+	app.Get("/todos", handlers.GetAllTodos(service))
+	app.Get("/todo/:id", handlers.GetTodoById(service))
 }

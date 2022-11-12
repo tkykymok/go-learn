@@ -6,7 +6,8 @@ import (
 )
 
 type Service interface {
-	FetchTodos(ctx context.Context) (*[]presenter.Todo, error)
+	FetchAllTodos(ctx context.Context) (*[]presenter.Todo, error)
+	FetchTodoById(ctx context.Context, id int) (*presenter.Todo, error)
 }
 
 type service struct {
@@ -19,6 +20,10 @@ func NewService(r Repository) Service {
 	}
 }
 
-func (s service) FetchTodos(ctx context.Context) (*[]presenter.Todo, error) {
-	return s.repository.ReadTodos(ctx)
+func (s service) FetchAllTodos(ctx context.Context) (*[]presenter.Todo, error) {
+	return s.repository.ReadAllTodos(ctx)
+}
+
+func (s service) FetchTodoById(ctx context.Context, id int) (*presenter.Todo, error) {
+	return s.repository.ReadTodoById(ctx, id)
 }

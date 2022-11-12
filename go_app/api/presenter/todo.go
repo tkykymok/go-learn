@@ -3,7 +3,6 @@ package presenter
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/volatiletech/null/v8"
-	"go_app/pkg/models"
 )
 
 type Todo struct {
@@ -13,7 +12,7 @@ type Todo struct {
 	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 }
 
-func TodoSuccessResponse(data *models.Todo) *fiber.Map {
+func GetTodoByIdResponse(data *Todo) *fiber.Map {
 	todo := Todo{
 		ID:        data.ID,
 		Title:     data.Title,
@@ -27,7 +26,7 @@ func TodoSuccessResponse(data *models.Todo) *fiber.Map {
 	}
 }
 
-func TodosSuccessResponse(data *[]Todo) *fiber.Map {
+func GetAllTodosResponse(data *[]Todo) *fiber.Map {
 	return &fiber.Map{
 		"status": true,
 		"data":   data,
