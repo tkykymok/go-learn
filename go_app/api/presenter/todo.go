@@ -20,16 +20,19 @@ func GetTodoByIdResponse(data *Todo) *fiber.Map {
 		CreatedAt: data.CreatedAt,
 	}
 	return &fiber.Map{
-		"status": true,
-		"data":   todo,
-		"error":  nil,
+		"data": todo,
 	}
 }
 
 func GetAllTodosResponse(data *[]Todo) *fiber.Map {
 	return &fiber.Map{
-		"status": true,
-		"data":   data,
-		"error":  nil,
+		"data": data,
+	}
+}
+
+func SuccessResponse(message string) *fiber.Map {
+	return &fiber.Map{
+		"data":    nil,
+		"message": message,
 	}
 }

@@ -11,6 +11,7 @@ type Repository interface {
 	ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error)
 	ReadTodoById(ctx context.Context, id int) (*presenter.Todo, error)
 	CreateTodo(ctx context.Context, todo *models.Todo) error
+	UpdateTodo(ctx context.Context, todo *models.Todo) error
 }
 
 type repository struct {
@@ -58,6 +59,14 @@ func (r repository) ReadTodoById(ctx context.Context, id int) (*presenter.Todo, 
 
 func (r repository) CreateTodo(ctx context.Context, todo *models.Todo) error {
 	err := todo.InsertG(ctx, boil.Infer())
+	if err != nil {
+		return nil
+	}
+	return err
+}
+
+func (r repository) UpdateTodo(ctx context.Context, todo *models.Todo) error {
+	_, err := todo.UpdateG(ctx, boil.Infer())
 	if err != nil {
 		return nil
 	}

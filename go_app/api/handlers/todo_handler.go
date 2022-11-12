@@ -57,6 +57,27 @@ func AddTodo(service todo.Service) fiber.Handler {
 			return c.JSON(presenter.ErrorResponse(err))
 		}
 
-		return c.JSON(request)
+		return c.JSON(presenter.SuccessResponse("登録が完了しました。"))
+	}
+}
+
+func UpdateTodo(service todo.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		customContext, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		var request requests.UpdateTodo
+		err := c.BodyParser(&request)
+		if err != nil {
+			return err
+		}
+
+		err = service.UpdateTodo(customContext, request)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+			return c.JSON(presenter.ErrorResponse(err))
+		}
+
+		return c.JSON(presenter.SuccessResponse("更新が完了しました。"))
 	}
 }
