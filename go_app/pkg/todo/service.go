@@ -20,5 +20,5 @@ func NewService(r Repository) Service {
 }
 
 func (s service) FetchTodos(ctx context.Context) (*[]presenter.Todo, error) {
-	return s.repository.ReadBooks(ctx)
+	return s.repository.ReadTodos(ctx)
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type Repository interface {
-	ReadBooks(ctx context.Context) (*[]presenter.Todo, error)
+	ReadTodos(ctx context.Context) (*[]presenter.Todo, error)
 }
 
 type repository struct {
@@ -18,7 +18,7 @@ func NewRepo() Repository {
 	return &repository{}
 }
 
-func (r repository) ReadBooks(ctx context.Context) (*[]presenter.Todo, error) {
+func (r repository) ReadTodos(ctx context.Context) (*[]presenter.Todo, error) {
 	var todos []presenter.Todo
 
 	result, err := models.Todos().All(ctx, boil.GetContextDB())
