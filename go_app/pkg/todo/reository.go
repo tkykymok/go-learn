@@ -10,7 +10,7 @@ import (
 type Repository interface {
 	ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error)
 	ReadTodoById(ctx context.Context, id int) (*presenter.Todo, error)
-	CreateTodo(ctx context.Context, todo *models.Todo)
+	CreateTodo(ctx context.Context, todo *models.Todo) error
 }
 
 type repository struct {
@@ -56,9 +56,10 @@ func (r repository) ReadTodoById(ctx context.Context, id int) (*presenter.Todo, 
 	return &todo, nil
 }
 
-func (r repository) CreateTodo(ctx context.Context, todo *models.Todo) {
-	err := todo.Insert(ctx, boil.GetContextDB(), boil.Infer())
+func (r repository) CreateTodo(ctx context.Context, todo *models.Todo) error {
+	err := todo.InsertG(ctx, boil.Infer())
 	if err != nil {
-		return
+		return nil
 	}
+	return err
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"go_app/api/presenter"
+	"go_app/api/requests"
 	"go_app/pkg/todo"
 	"net/http"
 )
@@ -36,5 +37,26 @@ func GetTodoById(service todo.Service) fiber.Handler {
 			return c.JSON(presenter.ErrorResponse(err))
 		}
 		return c.JSON(presenter.GetTodoByIdResponse(fetched))
+	}
+}
+
+func AddTodo(service todo.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		customContext, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		var request requests.AddTodo
+		err := c.BodyParser(&request)
+		if err != nil {
+			return err
+		}
+
+		err = service.InsertTodo(customContext, request)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+			return c.JSON(presenter.ErrorResponse(err))
+		}
+
+		return c.JSON(request)
 	}
 }

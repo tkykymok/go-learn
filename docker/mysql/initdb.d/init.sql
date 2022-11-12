@@ -2,6 +2,7 @@ DROP DATABASE IF EXISTS go_app_test;
 CREATE DATABASE go_app_test;
 USE go_app_test;
 
+-- todos
 DROP TABLE IF EXISTS `todos`;
 CREATE TABLE `todos`
 (
@@ -19,6 +20,7 @@ VALUES ('2', 'テスト2', '0', '1', '2022-01-01');
 INSERT INTO `todos` (`id`, `title`, `completed`, `userId`, `created_at`)
 VALUES ('3', 'テスト3', '0', '1', '2022-01-01');
 
+-- users
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`
 (
