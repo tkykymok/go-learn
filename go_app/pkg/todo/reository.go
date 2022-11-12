@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error)
 	ReadTodoById(ctx context.Context, id int) (*presenter.Todo, error)
+	CreateTodo(ctx context.Context, todo *models.Todo)
 }
 
 type repository struct {
@@ -21,7 +22,7 @@ func NewRepo() Repository {
 
 func (r repository) ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error) {
 	var todos []presenter.Todo
-	result, err := models.Todos().All(ctx, boil.GetContextDB())
+	result, err := models.Todos().AllG(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +41,7 @@ func (r repository) ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error)
 }
 
 func (r repository) ReadTodoById(ctx context.Context, id int) (*presenter.Todo, error) {
-	result, err := models.FindTodo(ctx, boil.GetContextDB(), id)
+	result, err := models.FindTodoG(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -53,4 +54,11 @@ func (r repository) ReadTodoById(ctx context.Context, id int) (*presenter.Todo, 
 	}
 
 	return &todo, nil
+}
+
+func (r repository) CreateTodo(ctx context.Context, todo *models.Todo) {
+	err := todo.Insert(ctx, boil.GetContextDB(), boil.Infer())
+	if err != nil {
+		return
+	}
 }

@@ -20,4 +20,4 @@ exe-db:
 	docker compose exec db sh
 
 create-models:
-	docker compose exec -w /go_app/pkg go sqlboiler mysql models -p models --no-tests --wipe
+	docker compose exec -w /app/pkg go sqlboiler mysql models -p models --no-tests --wipe --add-global-variants

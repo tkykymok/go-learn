@@ -27,6 +27,7 @@ type Todo struct {
 	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Title     null.String `boil:"title" json:"title,omitempty" toml:"title" yaml:"title,omitempty"`
 	Completed bool        `boil:"completed" json:"completed" toml:"completed" yaml:"completed"`
+	UserId    int         `boil:"userId" json:"userId" toml:"userId" yaml:"userId"`
 	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 
 	R *todoR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -37,11 +38,13 @@ var TodoColumns = struct {
 	ID        string
 	Title     string
 	Completed string
+	UserId    string
 	CreatedAt string
 }{
 	ID:        "id",
 	Title:     "title",
 	Completed: "completed",
+	UserId:    "userId",
 	CreatedAt: "created_at",
 }
 
@@ -49,11 +52,13 @@ var TodoTableColumns = struct {
 	ID        string
 	Title     string
 	Completed string
+	UserId    string
 	CreatedAt string
 }{
 	ID:        "todos.id",
 	Title:     "todos.title",
 	Completed: "todos.completed",
+	UserId:    "todos.userId",
 	CreatedAt: "todos.created_at",
 }
 
@@ -157,11 +162,13 @@ var TodoWhere = struct {
 	ID        whereHelperint
 	Title     whereHelpernull_String
 	Completed whereHelperbool
+	UserId    whereHelperint
 	CreatedAt whereHelpernull_Time
 }{
 	ID:        whereHelperint{field: "`todos`.`id`"},
 	Title:     whereHelpernull_String{field: "`todos`.`title`"},
 	Completed: whereHelperbool{field: "`todos`.`completed`"},
+	UserId:    whereHelperint{field: "`todos`.`userId`"},
 	CreatedAt: whereHelpernull_Time{field: "`todos`.`created_at`"},
 }
 
@@ -182,8 +189,8 @@ func (*todoR) NewStruct() *todoR {
 type todoL struct{}
 
 var (
-	todoAllColumns            = []string{"id", "title", "completed", "created_at"}
-	todoColumnsWithoutDefault = []string{"id", "title", "created_at"}
+	todoAllColumns            = []string{"id", "title", "completed", "userId", "created_at"}
+	todoColumnsWithoutDefault = []string{"id", "title", "userId", "created_at"}
 	todoColumnsWithDefault    = []string{"completed"}
 	todoPrimaryKeyColumns     = []string{"id"}
 	todoGeneratedColumns      = []string{}
@@ -395,6 +402,11 @@ func AddTodoHook(hookPoint boil.HookPoint, todoHook TodoHook) {
 	}
 }
 
+// OneG returns a single todo record from the query using the global executor.
+func (q todoQuery) OneG(ctx context.Context) (*Todo, error) {
+	return q.One(ctx, boil.GetContextDB())
+}
+
 // One returns a single todo record from the query.
 func (q todoQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Todo, error) {
 	o := &Todo{}
@@ -414,6 +426,11 @@ func (q todoQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Todo, e
 	}
 
 	return o, nil
+}
+
+// AllG returns all Todo records from the query using the global executor.
+func (q todoQuery) AllG(ctx context.Context) (TodoSlice, error) {
+	return q.All(ctx, boil.GetContextDB())
 }
 
 // All returns all Todo records from the query.
@@ -436,6 +453,11 @@ func (q todoQuery) All(ctx context.Context, exec boil.ContextExecutor) (TodoSlic
 	return o, nil
 }
 
+// CountG returns the count of all Todo records in the query using the global executor
+func (q todoQuery) CountG(ctx context.Context) (int64, error) {
+	return q.Count(ctx, boil.GetContextDB())
+}
+
 // Count returns the count of all Todo records in the query.
 func (q todoQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
@@ -449,6 +471,11 @@ func (q todoQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64,
 	}
 
 	return count, nil
+}
+
+// ExistsG checks if the row exists in the table using the global executor.
+func (q todoQuery) ExistsG(ctx context.Context) (bool, error) {
+	return q.Exists(ctx, boil.GetContextDB())
 }
 
 // Exists checks if the row exists in the table.
@@ -476,6 +503,11 @@ func Todos(mods ...qm.QueryMod) todoQuery {
 	}
 
 	return todoQuery{q}
+}
+
+// FindTodoG retrieves a single record by ID.
+func FindTodoG(ctx context.Context, iD int, selectCols ...string) (*Todo, error) {
+	return FindTodo(ctx, boil.GetContextDB(), iD, selectCols...)
 }
 
 // FindTodo retrieves a single record by ID with an executor.
@@ -506,6 +538,11 @@ func FindTodo(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols
 	}
 
 	return todoObj, nil
+}
+
+// InsertG a single record. See Insert for whitelist behavior description.
+func (o *Todo) InsertG(ctx context.Context, columns boil.Columns) error {
+	return o.Insert(ctx, boil.GetContextDB(), columns)
 }
 
 // Insert a single record using an executor.
@@ -610,6 +647,12 @@ CacheNoHooks:
 	return o.doAfterInsertHooks(ctx, exec)
 }
 
+// UpdateG a single Todo record using the global executor.
+// See Update for more documentation.
+func (o *Todo) UpdateG(ctx context.Context, columns boil.Columns) (int64, error) {
+	return o.Update(ctx, boil.GetContextDB(), columns)
+}
+
 // Update uses an executor to update the Todo.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
@@ -673,6 +716,11 @@ func (o *Todo) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
+// UpdateAllG updates all rows with the specified column values.
+func (q todoQuery) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return q.UpdateAll(ctx, boil.GetContextDB(), cols)
+}
+
 // UpdateAll updates all rows with the specified column values.
 func (q todoQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
@@ -688,6 +736,11 @@ func (q todoQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 	}
 
 	return rowsAff, nil
+}
+
+// UpdateAllG updates all rows with the specified column values.
+func (o TodoSlice) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return o.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
@@ -736,6 +789,11 @@ func (o TodoSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all todo")
 	}
 	return rowsAff, nil
+}
+
+// UpsertG attempts an insert, and does an update or ignore on conflict.
+func (o *Todo) UpsertG(ctx context.Context, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(ctx, boil.GetContextDB(), updateColumns, insertColumns)
 }
 
 var mySQLTodoUniqueColumns = []string{
@@ -883,6 +941,12 @@ CacheNoHooks:
 	return o.doAfterUpsertHooks(ctx, exec)
 }
 
+// DeleteG deletes a single Todo record.
+// DeleteG will match against the primary key column to find the record to delete.
+func (o *Todo) DeleteG(ctx context.Context) (int64, error) {
+	return o.Delete(ctx, boil.GetContextDB())
+}
+
 // Delete deletes a single Todo record with an executor.
 // Delete will match against the primary key column to find the record to delete.
 func (o *Todo) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
@@ -919,6 +983,10 @@ func (o *Todo) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, er
 	return rowsAff, nil
 }
 
+func (q todoQuery) DeleteAllG(ctx context.Context) (int64, error) {
+	return q.DeleteAll(ctx, boil.GetContextDB())
+}
+
 // DeleteAll deletes all matching rows.
 func (q todoQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
@@ -938,6 +1006,11 @@ func (q todoQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (in
 	}
 
 	return rowsAff, nil
+}
+
+// DeleteAllG deletes all rows in the slice.
+func (o TodoSlice) DeleteAllG(ctx context.Context) (int64, error) {
+	return o.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
@@ -989,6 +1062,15 @@ func (o TodoSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (in
 	return rowsAff, nil
 }
 
+// ReloadG refetches the object from the database using the primary keys.
+func (o *Todo) ReloadG(ctx context.Context) error {
+	if o == nil {
+		return errors.New("models: no Todo provided for reload")
+	}
+
+	return o.Reload(ctx, boil.GetContextDB())
+}
+
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Todo) Reload(ctx context.Context, exec boil.ContextExecutor) error {
@@ -999,6 +1081,16 @@ func (o *Todo) Reload(ctx context.Context, exec boil.ContextExecutor) error {
 
 	*o = *ret
 	return nil
+}
+
+// ReloadAllG refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+func (o *TodoSlice) ReloadAllG(ctx context.Context) error {
+	if o == nil {
+		return errors.New("models: empty TodoSlice provided for reload all")
+	}
+
+	return o.ReloadAll(ctx, boil.GetContextDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
@@ -1028,6 +1120,11 @@ func (o *TodoSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) er
 	*o = slice
 
 	return nil
+}
+
+// TodoExistsG checks if the Todo row exists.
+func TodoExistsG(ctx context.Context, iD int) (bool, error) {
+	return TodoExists(ctx, boil.GetContextDB(), iD)
 }
 
 // TodoExists checks if the Todo row exists.
