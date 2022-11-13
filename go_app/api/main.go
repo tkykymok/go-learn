@@ -19,7 +19,7 @@ import (
 func connectDB() {
 	err := godotenv.Load("/app/configs/.env")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	jst, _ := time.LoadLocation(os.Getenv("LOC"))
@@ -35,7 +35,7 @@ func connectDB() {
 	}
 	db, err := sql.Open("mysql", c.FormatDSN())
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
