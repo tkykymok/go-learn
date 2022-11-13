@@ -6,7 +6,7 @@ USE go_app_test;
 DROP TABLE IF EXISTS `todos`;
 CREATE TABLE `todos`
 (
-    `id`         INT         NOT NULL,
+    `id`         INT         NOT NULL AUTO_INCREMENT,
     `title`      VARCHAR(45) NULL,
     `completed`  TINYINT(1)  NOT NULL DEFAULT 0,
     `userId`     INT         NOT NULL,
@@ -25,7 +25,7 @@ VALUES ('3', 'テスト3', '0', '1', '0', '2022-01-01');
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`
 (
-    `id`   INT         NOT NULL,
+    `id`   INT         NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(45) NULL,
     PRIMARY KEY (`id`)
 );
