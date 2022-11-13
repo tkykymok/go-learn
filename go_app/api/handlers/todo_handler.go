@@ -41,7 +41,7 @@ func GetTodoById(service todo.Service) fiber.Handler {
 	}
 }
 
-func AddTodo(service todo.Service) fiber.Handler {
+func AddTodo(service todo.Service, validate *validator.Validate) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		customContext, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -53,7 +53,6 @@ func AddTodo(service todo.Service) fiber.Handler {
 		}
 
 		// バリデーションチェック
-		validate := validator.New()
 		err = validate.Struct(&request)
 		if err != nil {
 			c.Status(http.StatusBadRequest)

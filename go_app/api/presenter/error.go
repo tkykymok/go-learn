@@ -23,15 +23,13 @@ func ValidationErrorResponse(err error) *fiber.Map {
 	var errors []*ValidationError
 	for _, err := range err.(validator.ValidationErrors) {
 		var temp ValidationError
-		temp.FailedField = err.StructNamespace()
+		temp.FailedField = err.StructField()
 		temp.Tag = err.Tag()
 		temp.Value = err.Param()
 		errors = append(errors, &temp)
 	}
 
 	return &fiber.Map{
-		"FailedField": "",
-		"Tag":         "",
-		"errors":      err.Error(),
+		"errors": errors,
 	}
 }
