@@ -2,14 +2,14 @@ package presenter
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/volatiletech/null/v8"
+	"time"
 )
 
 type Todo struct {
-	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Title     null.String `boil:"title" json:"title,omitempty" toml:"title" yaml:"title,omitempty"`
-	Completed bool        `boil:"completed" json:"completed" toml:"completed" yaml:"completed"`
-	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Title     string    `boil:"title" json:"title,omitempty" toml:"title" yaml:"title,omitempty"`
+	Completed bool      `boil:"completed" json:"completed" toml:"completed" yaml:"completed"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 }
 
 func GetTodoByIdResponse(data *Todo) *fiber.Map {

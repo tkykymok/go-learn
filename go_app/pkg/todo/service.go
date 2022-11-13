@@ -10,8 +10,8 @@ import (
 type Service interface {
 	FetchAllTodos(ctx context.Context) (*[]presenter.Todo, error)
 	FetchTodoById(ctx context.Context, id int) (*presenter.Todo, error)
-	InsertTodo(ctx context.Context, todo requests.AddTodo) error
-	UpdateTodo(ctx context.Context, todo requests.UpdateTodo) error
+	InsertTodo(ctx context.Context, todo *requests.AddTodo) error
+	UpdateTodo(ctx context.Context, todo *requests.UpdateTodo) error
 }
 
 type service struct {
@@ -32,14 +32,14 @@ func (s service) FetchTodoById(ctx context.Context, id int) (*presenter.Todo, er
 	return s.repository.ReadTodoById(ctx, id)
 }
 
-func (s service) InsertTodo(ctx context.Context, todo requests.AddTodo) error {
+func (s service) InsertTodo(ctx context.Context, todo *requests.AddTodo) error {
 	cTodo := models.Todo{
 		Title: todo.Title,
 	}
 	return s.repository.CreateTodo(ctx, &cTodo)
 }
 
-func (s service) UpdateTodo(ctx context.Context, todo requests.UpdateTodo) error {
+func (s service) UpdateTodo(ctx context.Context, todo *requests.UpdateTodo) error {
 	uTodo := models.Todo{
 		ID:        todo.ID,
 		Title:     todo.Title,

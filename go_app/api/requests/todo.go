@@ -1,13 +1,11 @@
 package requests
 
-import "github.com/volatiletech/null/v8"
-
 type AddTodo struct {
-	Title null.String
+	Title string `json:"title" validate:"required"`
 }
 
 type UpdateTodo struct {
 	ID        int
-	Title     null.String
+	Title     string
 	Completed bool
 }

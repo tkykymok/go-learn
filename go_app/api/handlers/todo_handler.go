@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go_app/api/presenter"
 	"go_app/api/requests"
@@ -51,7 +52,15 @@ func AddTodo(service todo.Service) fiber.Handler {
 			return err
 		}
 
-		err = service.InsertTodo(customContext, request)
+		// バリデーションチェック
+		validate := validator.New()
+		err = validate.Struct(&request)
+		if err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(presenter.ValidationErrorResponse(err))
+		}
+
+		err = service.InsertTodo(customContext, &request)
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.ErrorResponse(err))
@@ -72,7 +81,7 @@ func UpdateTodo(service todo.Service) fiber.Handler {
 			return err
 		}
 
-		err = service.UpdateTodo(customContext, request)
+		err = service.UpdateTodo(customContext, &request)
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.ErrorResponse(err))
