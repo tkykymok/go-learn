@@ -4,7 +4,6 @@ import (
 	"app/api/routes"
 	"app/pkg/todo"
 	"database/sql"
-	"github.com/go-playground/validator/v10"
 	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
@@ -50,12 +49,11 @@ func main() {
 	connectDB()
 
 	app := fiber.New()
-	validate := validator.New()
 	app.Use(cors.New())
 
 	// routing
 	api := app.Group("/api")
-	routes.TodoRouter(api, todo.NewService(todo.NewRepo()), validate)
+	routes.TodoRouter(api, todo.NewService(todo.NewRepo()))
 
 	log.Fatal(app.Listen(":8080"))
 }

@@ -5,7 +5,6 @@ import (
 	"app/api/requests"
 	"app/pkg/todo"
 	"context"
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
@@ -41,7 +40,7 @@ func GetTodoById(service todo.Service) fiber.Handler {
 	}
 }
 
-func AddTodo(service todo.Service, validate *validator.Validate) fiber.Handler {
+func AddTodo(service todo.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		customContext, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -53,6 +52,7 @@ func AddTodo(service todo.Service, validate *validator.Validate) fiber.Handler {
 		}
 
 		// バリデーションチェック
+		validate := getValidateInstance()
 		err = validate.Struct(&request)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
