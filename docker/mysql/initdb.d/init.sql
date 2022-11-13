@@ -7,11 +7,11 @@ DROP TABLE IF EXISTS `todos`;
 CREATE TABLE `todos`
 (
     `id`         INT         NOT NULL AUTO_INCREMENT,
-    `title`      VARCHAR(45) NULL,
+    `title`      VARCHAR(45) NOT NULL,
     `completed`  TINYINT(1)  NOT NULL DEFAULT 0,
     `userId`     INT         NOT NULL,
     `deleted`    TINYINT(1)  NOT NULL DEFAULT 0,
-    `created_at` DATETIME    NULL,
+    `created_at` DATETIME    NOT NULL,
     PRIMARY KEY (`id`)
 );
 INSERT INTO `todos` (`id`, `title`, `completed`, `userId`, `deleted`, `created_at`)
@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`
 (
     `id`   INT         NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(45) NULL,
+    `name` VARCHAR(45) NOT NULL,
     PRIMARY KEY (`id`)
 );
 INSERT INTO `users` (`id`, `name`)
