@@ -1,6 +1,8 @@
 package main
 
 import (
+	"app/api/routes"
+	"app/pkg/todo"
 	"database/sql"
 	"github.com/go-playground/validator/v10"
 	"github.com/go-sql-driver/mysql"
@@ -10,15 +12,13 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	_ "github.com/volatiletech/sqlboiler/v4/boil"
-	"go_app/api/routes"
-	"go_app/pkg/todo"
 	"log"
 	"os"
 	"time"
 )
 
 func connectDB() {
-	err := godotenv.Load("../conf/.env")
+	err := godotenv.Load("/app/configs/.env")
 	if err != nil {
 		panic(err)
 	}

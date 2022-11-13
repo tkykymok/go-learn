@@ -1,4 +1,4 @@
-module go_app
+module app
 
 go 1.19
 

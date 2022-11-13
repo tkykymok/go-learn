@@ -1,10 +1,10 @@
 package todo
 
 import (
+	"app/api/presenter"
+	"app/pkg/models"
 	"context"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"go_app/api/presenter"
-	"go_app/pkg/models"
 )
 
 type Repository interface {

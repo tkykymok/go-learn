@@ -1,10 +1,10 @@
 package todo
 
 import (
+	"app/api/presenter"
+	"app/api/requests"
+	"app/pkg/models"
 	"context"
-	"go_app/api/presenter"
-	"go_app/api/requests"
-	"go_app/pkg/models"
 )
 
 type Service interface {

@@ -1,12 +1,12 @@
 package handlers
 
 import (
+	"app/api/presenter"
+	"app/api/requests"
+	"app/pkg/todo"
 	"context"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"go_app/api/presenter"
-	"go_app/api/requests"
-	"go_app/pkg/todo"
 	"net/http"
 )
 
