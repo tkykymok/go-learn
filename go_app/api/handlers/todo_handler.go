@@ -3,6 +3,7 @@ package handlers
 import (
 	"app/api/presenter"
 	"app/api/requests"
+	"app/api/validation"
 	"app/pkg/todo"
 	"context"
 	"github.com/gofiber/fiber/v2"
@@ -52,7 +53,7 @@ func AddTodo(service todo.Service) fiber.Handler {
 		}
 
 		// バリデーションチェック
-		validate := getValidateInstance()
+		validate := validation.GetValidateInstance()
 		err = validate.Struct(&request)
 		if err != nil {
 			c.Status(http.StatusBadRequest)

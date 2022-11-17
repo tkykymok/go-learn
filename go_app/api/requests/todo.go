@@ -1,7 +1,7 @@
 package requests
 
 type AddTodo struct {
-	Title string `validate:"required"`
+	Title string `validate:"required,title-custom"`
 }
 
 type UpdateTodo struct {

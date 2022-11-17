@@ -1,10 +1,9 @@
 package presenter
 
 import (
-	"app/configs"
+	"app/api/message"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"strings"
 )
 
 type ValidationError struct {
@@ -24,13 +23,12 @@ func ErrorResponse(err error) *fiber.Map {
 
 func ValidationErrorResponse(err error) *fiber.Map {
 	var errors []*ValidationError
-	fieldNamesMap := configs.GetFieldNames()
 	for _, err := range err.(validator.ValidationErrors) {
 		var temp ValidationError
 		temp.FailedField = err.StructField()
 		temp.Tag = err.Tag()
 		temp.Value = err.Param()
-		temp.Message = fieldNamesMap[strings.ToLower(err.StructField())] + "は必須です。" // TODO メッセージの設定を共通化
+		temp.Message = message.GetMessage(err.Tag(), message.GetFieldName(err.StructField()))
 		errors = append(errors, &temp)
 	}
 
