@@ -9,8 +9,6 @@ RUN apk update &&  \
     go install github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-mysql@latest && \
     go install github.com/go-delve/delve/cmd/dlv@latest
 
-WORKDIR /app
-RUN go mod tidy
-
 WORKDIR /app/api
+RUN go get
 CMD ["air"]
