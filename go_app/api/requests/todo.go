@@ -5,8 +5,8 @@ type AddTodo struct {
 }
 
 type UpdateTodo struct {
-	ID        int
-	Title     string
+	ID        int    `validate:"required"`
+	Title     string `validate:"required,title-custom"`
 	Completed bool
 }
 

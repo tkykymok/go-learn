@@ -47,7 +47,6 @@ func GetTodosWithRelatedResponse(data *[]TodoWithRelated) *fiber.Map {
 
 func SuccessResponse(message string) *fiber.Map {
 	return &fiber.Map{
-		"data":    nil,
 		"message": message,
 	}
 }

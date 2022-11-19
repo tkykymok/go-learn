@@ -7,6 +7,7 @@ import (
 	"app/api/validation"
 	"app/pkg/todo"
 	"context"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"log"
 	"net/http"
@@ -100,6 +101,14 @@ func UpdateTodo(service todo.Service) fiber.Handler {
 		err := c.BodyParser(&request)
 		if err != nil {
 			return err
+		}
+
+		// バリデーションチェック
+		fmt.Println(request)
+		err = validation.ValidateStruct(&request)
+		if err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(presenter.ValidationErrorResponse(err))
 		}
 
 		err = service.UpdateTodo(customContext, &request)
