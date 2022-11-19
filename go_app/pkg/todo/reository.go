@@ -2,6 +2,7 @@ package todo
 
 import (
 	"app/api/presenter"
+	"app/api/requests"
 	"app/pkg/exmodels"
 	"app/pkg/models"
 	"context"
@@ -13,7 +14,7 @@ import (
 
 type Repository interface {
 	ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error)
-	ReadTodosWithRelated(ctx context.Context) (*[]presenter.TodoWithRelated, error)
+	ReadTodosWithRelated(ctx context.Context, request *requests.GetTodosWithRelated) (*[]presenter.TodoWithRelated, error)
 	ReadTodoById(ctx context.Context, id int) (*presenter.Todo, error)
 	CreateTodo(ctx context.Context, todo *models.Todo) error
 	UpdateTodo(ctx context.Context, todo *models.Todo) error
@@ -27,7 +28,7 @@ func NewRepo() Repository {
 }
 
 func (r repository) ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error) {
-	var todos []presenter.Todo
+	todos := make([]presenter.Todo, 0)
 	result, err := models.Todos().AllG(ctx)
 	if err != nil {
 		return nil, err
@@ -46,10 +47,10 @@ func (r repository) ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error)
 	return &todos, nil
 }
 
-func (r repository) ReadTodosWithRelated(ctx context.Context) (*[]presenter.TodoWithRelated, error) {
-	var todos []presenter.TodoWithRelated
+func (r repository) ReadTodosWithRelated(ctx context.Context, request *requests.GetTodosWithRelated) (*[]presenter.TodoWithRelated, error) {
+	todos := make([]presenter.TodoWithRelated, 0)
 
-	var result []exmodels.TodoWithRelated
+	// SELECTするカラム
 	selectCols := []string{
 		models.TodoTableColumns.ID,
 		models.TodoTableColumns.Title,
@@ -57,10 +58,22 @@ func (r repository) ReadTodosWithRelated(ctx context.Context) (*[]presenter.Todo
 		models.UserTableColumns.Name,
 		models.TodoTableColumns.CreatedAt,
 	}
-	query := models.Todos(
+
+	// QueryModの生成
+	mods := []qm.QueryMod{
 		qm.Select(strings.Join(selectCols, ",")),
-		qm.LeftOuterJoin("users on todos.userId = users.id"))
-	err := query.BindG(ctx, &result)
+		qm.LeftOuterJoin("users on todos.userId = users.id"),
+	}
+	// WHERE句
+	if request.ID != 0 {
+		mods = append(mods, qm.Where("todos.id=?", request.ID))
+	}
+	if request.UserId != 0 {
+		mods = append(mods, qm.Where("users.id=?", request.UserId))
+	}
+
+	var result []exmodels.TodoWithRelated
+	err := models.Todos(mods...).BindG(ctx, &result)
 	if err != nil {
 		log.Fatal(err)
 	}

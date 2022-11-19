@@ -8,6 +8,7 @@ import (
 	"app/pkg/todo"
 	"context"
 	"github.com/gofiber/fiber/v2"
+	"log"
 	"net/http"
 )
 
@@ -31,7 +32,13 @@ func GetTodosWithRelated(service todo.Service) fiber.Handler {
 		customContext, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		fetched, err := service.FetchTodosWithRelated(customContext)
+		var request requests.GetTodosWithRelated
+		err := c.QueryParser(&request)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fetched, err := service.FetchTodosWithRelated(customContext, &request)
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.ErrorResponse(err))

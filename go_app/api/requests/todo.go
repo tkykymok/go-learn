@@ -9,3 +9,8 @@ type UpdateTodo struct {
 	Title     string
 	Completed bool
 }
+
+type GetTodosWithRelated struct {
+	ID     int
+	UserId int
+}
