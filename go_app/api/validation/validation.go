@@ -10,16 +10,29 @@ var lock = &sync.Mutex{}
 
 var validateInstance *validator.Validate
 
-func GetValidateInstance() *validator.Validate {
+func initValidateInstance() {
 	if validateInstance == nil {
 		lock.Lock()
 		defer lock.Unlock()
 		validateInstance = validator.New()
 
-		err := validateInstance.RegisterValidation("title-custom", customValidation)
-		if err != nil {
-			log.Fatal(err)
-		}
+		// カスタムバリデーション登録
+		registerCustomValidation("title-custom", customValidation)
 	}
-	return validateInstance
+}
+
+func registerCustomValidation(tag string, fn validator.Func) {
+	err := validateInstance.RegisterValidation(tag, fn)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ValidateStruct(request interface{}) error {
+	initValidateInstance()
+	err := validateInstance.Struct(request)
+	if err != nil {
+		return err
+	}
+	return nil
 }

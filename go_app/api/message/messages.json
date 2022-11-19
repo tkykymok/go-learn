@@ -1,4 +1,7 @@
 {
-  "required": "{0}は必須です。",
-  "title-custom": "カスタムメッセージ"
+  "required": "{fn}は必須です。",
+  "title-custom": "{fn}に@は使用できません。",
+
+
+  "success": "{0}が完了しました。"
 }

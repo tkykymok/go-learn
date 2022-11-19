@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"app/api/message"
 	"app/api/presenter"
 	"app/api/requests"
 	"app/api/validation"
@@ -53,8 +54,7 @@ func AddTodo(service todo.Service) fiber.Handler {
 		}
 
 		// バリデーションチェック
-		validate := validation.GetValidateInstance()
-		err = validate.Struct(&request)
+		err = validation.ValidateStruct(&request)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
 			return c.JSON(presenter.ValidationErrorResponse(err))
@@ -66,7 +66,7 @@ func AddTodo(service todo.Service) fiber.Handler {
 			return c.JSON(presenter.ErrorResponse(err))
 		}
 
-		return c.JSON(presenter.SuccessResponse("登録が完了しました。"))
+		return c.JSON(presenter.SuccessResponse(message.GetMessage("success", "登録")))
 	}
 }
 

@@ -7,10 +7,10 @@ import (
 )
 
 type ValidationError struct {
-	FailedField string
-	Tag         string
-	Value       string
-	Message     string
+	FailedField string `json:"failedField"`
+	Tag         string `json:"tag"`
+	Value       string `json:"value"`
+	Message     string `json:"message"`
 }
 
 func ErrorResponse(err error) *fiber.Map {
@@ -28,7 +28,7 @@ func ValidationErrorResponse(err error) *fiber.Map {
 		temp.FailedField = err.StructField()
 		temp.Tag = err.Tag()
 		temp.Value = err.Param()
-		temp.Message = message.GetMessage(err.Tag(), message.GetFieldName(err.StructField()))
+		temp.Message = message.GetValidationMessage(err.Tag(), err.StructField())
 		errors = append(errors, &temp)
 	}
 

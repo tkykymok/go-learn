@@ -29,6 +29,13 @@ func initMessages() {
 	}
 }
 
+func GetValidationMessage(errTag string, fieldName string) string {
+	initMessages()
+	message := messagesMapInstance[errTag]
+	message = strings.Replace(message, "{fn}", GetFieldName(fieldName), 1)
+	return message
+}
+
 func GetMessage(errTag string, args ...string) string {
 	initMessages()
 	message := messagesMapInstance[errTag]
