@@ -117,6 +117,6 @@ func UpdateTodo(service todo.Service) fiber.Handler {
 			return c.JSON(presenter.ErrorResponse(err))
 		}
 
-		return c.JSON(presenter.SuccessResponse("更新が完了しました。"))
+		return c.JSON(presenter.SuccessResponse(message.GetMessage("success", "更新")))
 	}
 }
