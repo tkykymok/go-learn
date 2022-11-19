@@ -9,6 +9,7 @@ import (
 
 type Service interface {
 	FetchAllTodos(ctx context.Context) (*[]presenter.Todo, error)
+	FetchTodosWithRelated(ctx context.Context) (*[]presenter.TodoWithRelated, error)
 	FetchTodoById(ctx context.Context, id int) (*presenter.Todo, error)
 	InsertTodo(ctx context.Context, todo *requests.AddTodo) error
 	UpdateTodo(ctx context.Context, todo *requests.UpdateTodo) error
@@ -26,6 +27,10 @@ func NewService(r Repository) Service {
 
 func (s service) FetchAllTodos(ctx context.Context) (*[]presenter.Todo, error) {
 	return s.repository.ReadAllTodos(ctx)
+}
+
+func (s service) FetchTodosWithRelated(ctx context.Context) (*[]presenter.TodoWithRelated, error) {
+	return s.repository.ReadTodosWithRelated(ctx)
 }
 
 func (s service) FetchTodoById(ctx context.Context, id int) (*presenter.Todo, error) {

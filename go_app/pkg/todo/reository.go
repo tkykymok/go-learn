@@ -2,13 +2,18 @@ package todo
 
 import (
 	"app/api/presenter"
+	"app/pkg/exmodels"
 	"app/pkg/models"
 	"context"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"log"
+	"strings"
 )
 
 type Repository interface {
 	ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error)
+	ReadTodosWithRelated(ctx context.Context) (*[]presenter.TodoWithRelated, error)
 	ReadTodoById(ctx context.Context, id int) (*presenter.Todo, error)
 	CreateTodo(ctx context.Context, todo *models.Todo) error
 	UpdateTodo(ctx context.Context, todo *models.Todo) error
@@ -33,6 +38,39 @@ func (r repository) ReadAllTodos(ctx context.Context) (*[]presenter.Todo, error)
 			ID:        t.ID,
 			Title:     t.Title,
 			Completed: t.Completed,
+			CreatedAt: t.CreatedAt,
+		}
+		todos = append(todos, todo)
+	}
+
+	return &todos, nil
+}
+
+func (r repository) ReadTodosWithRelated(ctx context.Context) (*[]presenter.TodoWithRelated, error) {
+	var todos []presenter.TodoWithRelated
+
+	var result []exmodels.TodoWithRelated
+	selectCols := []string{
+		models.TodoTableColumns.ID,
+		models.TodoTableColumns.Title,
+		models.TodoTableColumns.Completed,
+		models.UserTableColumns.Name,
+		models.TodoTableColumns.CreatedAt,
+	}
+	query := models.Todos(
+		qm.Select(strings.Join(selectCols, ",")),
+		qm.LeftOuterJoin("users on todos.userId = users.id"))
+	err := query.BindG(ctx, &result)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, t := range result {
+		todo := presenter.TodoWithRelated{
+			ID:        t.ID,
+			Title:     t.Title,
+			Completed: t.Completed,
+			Name:      t.Name,
 			CreatedAt: t.CreatedAt,
 		}
 		todos = append(todos, todo)

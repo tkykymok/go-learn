@@ -26,6 +26,20 @@ func GetAllTodos(service todo.Service) fiber.Handler {
 	}
 }
 
+func GetTodosWithRelated(service todo.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		customContext, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		fetched, err := service.FetchTodosWithRelated(customContext)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+			return c.JSON(presenter.ErrorResponse(err))
+		}
+		return c.JSON(presenter.GetTodosWithRelatedResponse(fetched))
+	}
+}
+
 func GetTodoById(service todo.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		customContext, cancel := context.WithCancel(context.Background())
